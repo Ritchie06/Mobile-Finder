@@ -1,0 +1,1188 @@
+FRONT-END CODE
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PhoneFinder — Detection System</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sand0:  #fdf8f2;
+  --sand1:  #f5ede0;
+  --sand2:  #ecddd0;
+  --sand3:  #d4bfa8;
+  --sand4:  #b8987a;
+  --sand5:  #8c6a4a;
+  --sand6:  #5c3d1e;
+  --glass:  rgba(255,251,245,0.72);
+  --glass2: rgba(255,251,245,0.45);
+  --shadow: 0 4px 24px rgba(100,70,40,0.10);
+  --shadow2:0 2px 10px rgba(100,70,40,0.07);
+  --accent: #c8883a;
+  --accent2:#e8a855;
+  --danger: #c0392b;
+  --success:#2e7d5e;
+  --text:   #2d1f0e;
+  --text2:  #7a5c3e;
+  --text3:  #a8866a;
+  --serif:  'DM Serif Display', serif;
+  --sans:   'DM Sans', sans-serif;
+  --radius: 20px;
+  --radius2:12px;
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--sand1);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.6;
+  overflow: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(220,180,120,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 85% 90%, rgba(180,140,90,0.12) 0%, transparent 55%);
+  pointer-events: none; z-index: 0;
+}
+
+.card {
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.card2 {
+  background: var(--glass2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.45);
+  border-radius: var(--radius2);
+  box-shadow: var(--shadow2);
+}
+
+.shell {
+  position: relative; z-index: 1;
+  display: grid;
+  grid-template-rows: 60px 1fr;
+  height: 100vh;
+  padding: 12px;
+  gap: 12px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 20px;
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.65);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow2);
+}
+.logo {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: #fff;
+  box-shadow: 0 2px 8px rgba(200,136,58,0.35);
+  flex-shrink: 0;
+}
+.brand-name {
+  font-family: var(--serif);
+  font-size: 18px;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+.brand-sub {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+  margin-left: 2px;
+}
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+.model-pill {
+  display: flex; align-items: center; gap: 7px;
+  padding: 5px 14px;
+  background: var(--glass2);
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 999px;
+  font-size: 11px; color: var(--text2);
+  letter-spacing: 0.08em;
+}
+.led {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--sand3); transition: all .3s;
+}
+.led.ready   { background: var(--success); box-shadow: 0 0 7px var(--success); animation: glow 2.5s infinite; }
+.led.loading { background: var(--accent2); animation: blink .7s infinite; }
+.led.error   { background: var(--danger); }
+@keyframes glow  { 0%,100%{opacity:1} 50%{opacity:.4} }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 12px;
+  min-height: 0;
+}
+
+.left {
+  display: flex; flex-direction: column;
+  gap: 10px; min-height: 0;
+}
+
+.tabs {
+  display: flex; gap: 6px;
+  padding: 5px;
+  background: var(--glass);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: var(--radius2);
+  box-shadow: var(--shadow2);
+  flex-shrink: 0;
+}
+.tab {
+  flex: 1; padding: 8px;
+  background: transparent; border: none;
+  font-family: var(--sans); font-size: 11px;
+  letter-spacing: 0.12em; color: var(--text3);
+  cursor: pointer; border-radius: 8px;
+  transition: all .2s; text-transform: uppercase;
+  font-weight: 700;
+}
+.tab:hover { color: var(--text2); background: rgba(255,255,255,0.5); }
+.tab.active {
+  color: var(--accent);
+  background: rgba(255,255,255,0.85);
+  box-shadow: 0 2px 8px rgba(100,70,40,0.1);
+  font-weight: 700;
+}
+
+.view {
+  flex: 1;
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: linear-gradient(135deg, #e8ddd0 0%, #d4c4b0 100%);
+  border: 1px solid rgba(255,255,255,0.6);
+  box-shadow: var(--shadow);
+  display: flex; align-items: center; justify-content: center;
+  min-height: 0;
+}
+
+.view::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(140,106,74,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(140,106,74,0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+
+.scanning-overlay {
+  position: absolute; inset: 0;
+  background: rgba(245,237,224,0.6);
+  backdrop-filter: blur(3px);
+  display: none !important;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 8;
+}
+.scanning-overlay.active { display: flex !important; }
+
+.scan-text {
+  font-size: 12px;
+  color: var(--accent);
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  font-weight: 600;
+  z-index: 1;
+}
+.scan-spinner {
+  width: 40px; height: 40px;
+  border: 2px solid var(--sand2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  z-index: 1;
+}
+
+.cm { position: absolute; width: 20px; height: 20px; border-color: var(--accent); border-style: solid; opacity: .5; pointer-events: none; z-index: 3; }
+.cm.tl { top:10px; left:10px;  border-width:2px 0 0 2px; border-radius:4px 0 0 0; }
+.cm.tr { top:10px; right:10px; border-width:2px 2px 0 0; border-radius:0 4px 0 0; }
+.cm.bl { bottom:10px; left:10px;  border-width:0 0 2px 2px; border-radius:0 0 0 4px; }
+.cm.br { bottom:10px; right:10px; border-width:0 2px 2px 0; border-radius:0 0 4px 0; }
+
+.placeholder {
+  text-align: center; color: var(--text3);
+  padding: 2rem; z-index: 1; pointer-events: none;
+}
+.ph-icon { font-size: 3rem; opacity: .25; margin-bottom: .75rem; line-height: 1; }
+.ph-text { font-size: 11px; letter-spacing: .15em; line-height: 2.2; text-transform: uppercase; }
+
+#resultCanvas, #videoEl {
+  max-width: 100%; max-height: 100%;
+  display: none; position: relative; z-index: 2;
+  border-radius: 0;
+}
+#resultCanvas.show, #videoEl.show { display: block; }
+
+#alertBanner {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 10px 20px;
+  background: rgba(46,125,94,0.12);
+  border-top: 1px solid rgba(46,125,94,0.3);
+  font-size: 11px; letter-spacing: .12em;
+  color: var(--success); z-index: 5;
+  display: none;
+  backdrop-filter: blur(8px);
+  font-weight: 500;
+}
+#alertBanner.show { display: block; }
+
+#loadOverlay {
+  position: absolute; inset: 0; z-index: 10;
+  background: rgba(245,237,224,0.88);
+  backdrop-filter: blur(12px);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 14px;
+  border-radius: var(--radius);
+}
+.spinner {
+  width: 36px; height: 36px;
+  border: 2px solid var(--sand2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+#loadText { font-size: 11px; color: var(--text3); letter-spacing: .15em; text-transform: uppercase; }
+.load-track { width: 140px; height: 2px; background: var(--sand2); border-radius: 1px; overflow: hidden; }
+#loadFill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); width: 0%; transition: width .3s; }
+
+.controls {
+  padding: 10px 14px;
+  display: flex; gap: 8px; align-items: center;
+  flex-shrink: 0;
+  background: var(--glass);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: var(--radius2);
+  box-shadow: var(--shadow2);
+}
+.ctrl-group { display: flex; gap: 8px; align-items: center; flex: 1; }
+
+.btn {
+  padding: 7px 16px;
+  border: 1px solid var(--sand3);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.6);
+  color: var(--text2);
+  font-family: var(--sans); font-size: 10px;
+  letter-spacing: .12em; cursor: pointer;
+  transition: all .18s; text-transform: uppercase;
+  white-space: nowrap; font-weight: 500;
+}
+.btn:hover:not(:disabled) {
+  border-color: var(--accent); color: var(--accent);
+  background: rgba(255,255,255,0.85);
+  box-shadow: 0 2px 8px rgba(200,136,58,0.15);
+}
+.btn.primary {
+  border-color: var(--accent); color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  box-shadow: 0 2px 10px rgba(200,136,58,0.3);
+}
+.btn.primary:hover:not(:disabled) {
+  box-shadow: 0 4px 16px rgba(200,136,58,0.4);
+  transform: translateY(-1px);
+}
+.btn.danger { border-color: var(--danger); color: var(--danger); background: rgba(192,57,43,0.06); }
+.btn:disabled { opacity: .3; cursor: not-allowed; }
+.file-hint { font-size: 10px; color: var(--text3); max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fps-tag { margin-left: auto; font-size: 10px; color: var(--text3); letter-spacing: .1em; }
+input[type=file] { display: none; }
+
+.right {
+  display: flex; flex-direction: column;
+  gap: 10px; overflow-y: auto; min-height: 0;
+}
+.right::-webkit-scrollbar { width: 3px; }
+.right::-webkit-scrollbar-thumb { background: var(--sand3); border-radius: 2px; }
+
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.stat {
+  padding: 12px 14px;
+  background: var(--glass2);
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: var(--radius2);
+}
+.stat-num {
+  font-family: var(--serif);
+  font-size: 26px; color: var(--accent);
+  line-height: 1; margin-bottom: 4px;
+}
+.stat-num.phone { color: var(--success); }
+.stat-num.warn  { color: var(--accent); }
+.stat-lbl { font-size: 10px; color: var(--text3); letter-spacing: .08em; text-transform: uppercase; }
+
+.pblock {
+  padding: 14px 16px;
+  background: var(--glass);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow2);
+}
+.plabel {
+  font-size: 12px; letter-spacing: .2em;
+  color: var(--text3); text-transform: uppercase;
+  margin-bottom: 10px; font-weight: 700;
+}
+
+.thresh-row { display: flex; align-items: center; gap: 10px; }
+.thresh-row label { font-size: 10px; color: var(--text3); flex-shrink: 0; letter-spacing:.08em; }
+.thresh-row input[type=range] {
+  flex: 1; cursor: pointer; height: 3px;
+  accent-color: var(--accent);
+}
+.thresh-val { font-size: 13px; color: var(--accent); min-width: 34px; text-align: right; font-weight: 500; }
+
+.det-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; border-radius: 8px;
+  margin-bottom: 4px; font-size: 12px;
+  background: rgba(255,255,255,0.4);
+  border: 1px solid transparent;
+  transition: all .2s;
+}
+.det-item.phone-item {
+  background: rgba(46,125,94,0.07);
+  border-color: rgba(46,125,94,0.2);
+}
+.det-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.det-dot.phone { background: var(--success); box-shadow: 0 0 5px var(--success); }
+.det-dot.other { background: var(--sand3); }
+.det-name { flex: 1; color: var(--text2); }
+.det-name.phone { color: var(--success); font-weight: 500; }
+.conf-bar-wrap { width: 48px; height: 3px; background: var(--sand2); border-radius: 2px; overflow: hidden; }
+.conf-bar { height: 100%; border-radius: 2px; transition: width .3s; }
+.conf-bar.phone { background: var(--success); }
+.conf-bar.other { background: var(--sand3); }
+.conf-pct { font-size: 10px; color: var(--text3); min-width: 28px; text-align: right; }
+.no-det { font-size: 10px; color: var(--text3); letter-spacing: .08em; }
+
+.log-area { flex: 1; overflow-y: auto; min-height: 0; }
+.log-area::-webkit-scrollbar { width: 3px; }
+.log-area::-webkit-scrollbar-thumb { background: var(--sand3); border-radius: 2px; }
+.log-entry {
+  display: flex; gap: 8px;
+  font-size: 10px; padding: 4px 0;
+  border-bottom: 1px solid rgba(180,159,136,0.12);
+  line-height: 1.5;
+}
+.log-time { color: var(--text3); flex-shrink: 0; }
+.log-msg       { color: var(--text2); }
+.log-msg.found { color: var(--success); font-weight: 500; }
+.log-msg.error { color: var(--danger); }
+.log-msg.sys   { color: var(--accent); }
+
+@media (max-width: 740px) {
+  .content { grid-template-columns: 1fr; }
+  .right { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">&#9670;</div>
+    <div>
+      <div class="brand-name">PhoneFinder</div>
+      <div class="brand-sub">TF Object Detection API</div>
+    </div>
+    <div class="header-right">
+      <div class="model-pill">
+        <div class="led loading" id="statusLed"></div>
+        <span id="statusLabel">Loading model</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- Left -->
+    <div class="left">
+
+      <!-- Tabs (only 2 now) -->
+      <div class="tabs">
+        <button class="tab active" id="tabCam" onclick="setMode('cam')">&#9679; Live Camera</button>
+        <button class="tab" id="tabImg"        onclick="setMode('img')">&#8593; Image Upload</button>
+      </div>
+
+      <!-- View -->
+      <div class="view" id="viewArea"
+        ondragover="handleDragOver(event)"
+        ondragleave="handleDragLeave(event)"
+        ondrop="handleDrop(event)">
+        <div class="cm tl"></div><div class="cm tr"></div>
+        <div class="cm bl"></div><div class="cm br"></div>
+
+        <div class="placeholder" id="placeholder">
+          <div class="ph-icon">&#9711;</div>
+          <p class="ph-text" id="phText">Model loading<br>please wait…</p>
+        </div>
+
+        <canvas id="resultCanvas"></canvas>
+        <video id="videoEl" autoplay muted playsinline></video>
+
+        <div class="scanning-overlay" id="scanOverlay">
+          <div class="scan-spinner"></div>
+          <div class="scan-text">Analyzing image...</div>
+        </div>
+
+        <div id="alertBanner"></div>
+
+        <div id="loadOverlay">
+          <div class="spinner"></div>
+          <div id="loadText">Initialising TF model</div>
+          <div class="load-track"><div id="loadFill"></div></div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls">
+        <div class="ctrl-group" id="ctrlCam">
+          <button class="btn primary" id="btnCamStart" onclick="startCam()" disabled>Start Camera</button>
+          <button class="btn danger"  id="btnCamStop"  onclick="stopCam()"  disabled>Stop</button>
+          <span class="fps-tag" id="fpsTag">-- fps</span>
+        </div>
+        <div class="ctrl-group" id="ctrlImg" style="display:none">
+          <button class="btn primary" onclick="document.getElementById('fileImg').click()">Choose Image</button>
+          <input type="file" id="fileImg" accept="image/*" onchange="loadImage(event)">
+          <button class="btn" id="btnAnalyze" onclick="analyzeImage()" disabled>Analyze</button>
+          <button class="btn" id="btnImgClear" onclick="clearImage()" disabled>Clear</button>
+          <span class="file-hint" id="imgName"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right -->
+    <div class="right">
+
+      <!-- Stats -->
+      <div class="pblock">
+        <div class="plabel">Detection Stats</div>
+        <div class="stats-grid">
+          <div class="stat">
+            <div class="stat-num phone" id="sPhones">0</div>
+            <div class="stat-lbl">Phones found</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num" id="sScans">0</div>
+            <div class="stat-lbl">Scans run</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num warn" id="sBestConf">—</div>
+            <div class="stat-lbl">Best conf.</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num" id="sLatency">—</div>
+            <div class="stat-lbl">Latency ms</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Threshold -->
+      <div class="pblock">
+        <div class="plabel">Confidence Threshold</div>
+        <div class="thresh-row">
+          <label>Min</label>
+          <input type="range" id="threshold" min="10" max="95" value="45" oninput="onThreshold(this.value)">
+          <span class="thresh-val" id="threshVal">45%</span>
+        </div>
+      </div>
+
+      <!-- Detections -->
+      <div class="pblock">
+        <div class="plabel">Detected Objects</div>
+        <div id="detItems"><div class="no-det">No detections yet.</div></div>
+      </div>
+
+      <!-- Log -->
+      <div class="pblock" style="flex:1;display:flex;flex-direction:column;min-height:0;">
+        <div class="plabel">Activity Log</div>
+        <div class="log-area" id="logArea">
+          <div id="logEntries"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://putting-civil-undefined-jpeg.trycloudflare.com';
+const NGROK_HEADERS = { 'ngrok-skip-browser-warning': 'true' };
+
+let mode = 'cam', threshold = 0.45, modelReady = false;
+let camStream = null, camRunning = false, animId = null;
+let scanCount = 0, fpsFrames = 0, fpsTimer = Date.now();
+let imageFile = null;
+let isProcessing = false;
+let lastDetectionTime = 0;
+const DETECTION_INTERVAL = 800;
+
+const statusLed   = document.getElementById('statusLed');
+const statusLabel = document.getElementById('statusLabel');
+const loadOverlay = document.getElementById('loadOverlay');
+const loadFill    = document.getElementById('loadFill');
+const loadText    = document.getElementById('loadText');
+const placeholder = document.getElementById('placeholder');
+const phText      = document.getElementById('phText');
+const resultCanvas= document.getElementById('resultCanvas');
+const videoEl     = document.getElementById('videoEl');
+const alertBanner = document.getElementById('alertBanner');
+const logEntries  = document.getElementById('logEntries');
+
+let loadPct = 0;
+const loadAnim = setInterval(() => {
+  loadPct = Math.min(loadPct + Math.random() * 6, 88);
+  loadFill.style.width = loadPct + '%';
+}, 250);
+
+async function pollStatus() {
+  try {
+    const r = await fetch(API + '/api/status', { headers: NGROK_HEADERS });
+    const d = await r.json();
+    if (d.status === 'ready') {
+      clearInterval(loadAnim);
+      loadFill.style.width = '100%';
+      setTimeout(() => {
+        loadOverlay.style.display = 'none';
+        setModelReady(true);
+      }, 400);
+    } else if (d.status === 'error') {
+      clearInterval(loadAnim);
+      loadText.textContent = 'Model load failed';
+      statusLed.className = 'led error';
+      statusLabel.textContent = 'Error';
+    } else { setTimeout(pollStatus, 1500); }
+  } catch { setTimeout(pollStatus, 2000); }
+}
+pollStatus();
+
+function setModelReady(ready) {
+  modelReady = ready;
+  statusLed.className = 'led ' + (ready ? 'ready' : 'loading');
+  statusLabel.textContent = ready ? 'Model ready' : 'Loading…';
+  phText.innerHTML = ready ? 'Select a mode above<br>or drag & drop an image' : 'Model loading<br>please wait...';
+  document.getElementById('btnCamStart').disabled = !ready;
+  log('sys', 'EfficientDet D1 model ready');
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.getElementById('viewArea').classList.add('drag-over');
+  if (mode === 'cam') setMode('img');
+}
+
+function handleDragLeave(e) {
+  e.preventDefault();
+  document.getElementById('viewArea').classList.remove('drag-over');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.getElementById('viewArea').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+
+  const isImage = file.type.startsWith('image/');
+
+  if (isImage) {
+    setMode('img');
+    imageFile = file;
+    document.getElementById('imgName').textContent = file.name;
+    document.getElementById('btnAnalyze').disabled  = false;
+    document.getElementById('btnImgClear').disabled = false;
+    const url = URL.createObjectURL(file);
+    const img = new window.Image();
+    img.onload = () => {
+      resultCanvas.width  = img.naturalWidth;
+      resultCanvas.height = img.naturalHeight;
+      const ctx = resultCanvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      resultCanvas.classList.add('show');
+      hidePlaceholder();
+    };
+    img.src = url;
+    log('sys', 'Image dropped: ' + file.name);
+  } else {
+    log('error', 'Unsupported file type — use jpg or png');
+  }
+}
+
+function setMode(m) {
+  stopCam(); clearImage();
+  mode = m;
+  ['cam','img'].forEach(id => {
+    const tab = document.getElementById('tab' + id.charAt(0).toUpperCase() + id.slice(1));
+    tab.classList.toggle('active', id === m);
+    const ctrl = document.getElementById('ctrl' + id.charAt(0).toUpperCase() + id.slice(1));
+    ctrl.style.display = id === m ? 'flex' : 'none';
+  });
+  showPlaceholder(); hideAlert();
+}
+
+function onThreshold(v) {
+  threshold = v / 100;
+  document.getElementById('threshVal').textContent = v + '%';
+}
+
+async function startCam() {
+  if (!modelReady) return;
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 } }
+    });
+    videoEl.srcObject = camStream;
+    videoEl.classList.add('show');
+    hidePlaceholder();
+    document.getElementById('btnCamStart').disabled = true;
+    document.getElementById('btnCamStop').disabled  = false;
+    camRunning = true;
+    log('sys', 'Camera started');
+    videoEl.onloadedmetadata = () => {
+      isProcessing = false;
+      hidePlaceholder();
+      camLoop();
+    };
+  } catch(e) { log('error', 'Camera error: ' + e.message); }
+}
+
+function stopCam() {
+  camRunning = false;
+  if (animId) { cancelAnimationFrame(animId); animId = null; }
+  if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+  videoEl.classList.remove('show');
+  videoEl.srcObject = null;
+  resultCanvas.classList.remove('show');
+  document.getElementById('btnCamStart').disabled = !modelReady;
+  document.getElementById('btnCamStop').disabled  = true;
+  document.getElementById('fpsTag').textContent = '-- fps';
+  hideAlert();
+}
+
+function camLoop() {
+  if (!camRunning) return;
+  videoEl.classList.add('show');
+  if (isProcessing) { animId = requestAnimationFrame(camLoop); return; }
+  const now2 = Date.now();
+  if (now2 - lastDetectionTime < DETECTION_INTERVAL) {
+    animId = requestAnimationFrame(camLoop);
+    return;
+  }
+  lastDetectionTime = now2;
+
+  const offscreen = document.createElement('canvas');
+  offscreen.width  = videoEl.videoWidth  || 480;
+  offscreen.height = videoEl.videoHeight || 360;
+  const octx = offscreen.getContext('2d');
+  octx.drawImage(videoEl, 0, 0);
+  const b64 = offscreen.toDataURL('image/jpeg', 0.3);
+  isProcessing = true;
+  
+const controller = new AbortController();
+const timeout = setTimeout(() => controller.abort(), 3000);
+fetch(API + '/api/detect/frame', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...NGROK_HEADERS },
+    body: JSON.stringify({ frame: b64, threshold }),
+    signal: controller.signal
+  }).finally(() => clearTimeout(timeout))
+
+  .then(r => r.json())
+  .then(data => {
+    isProcessing = false;
+    if (data.error) { log('error', data.error); return; }
+    drawAnnotated(data.annotated, offscreen.width, offscreen.height);
+    updateStats(data.detections, data.phone_count, null);
+    fpsFrames++;
+    const now = Date.now();
+    if (now - fpsTimer > 1000) {
+      document.getElementById('fpsTag').textContent = fpsFrames + ' fps';
+      fpsFrames = 0; fpsTimer = now;
+    }
+  })
+  .catch(() => { isProcessing = false; })
+  .finally(() => { if (camRunning) animId = requestAnimationFrame(camLoop); });
+}
+
+function loadImage(e) {
+  imageFile = e.target.files[0];
+  if (!imageFile) return;
+  document.getElementById('imgName').textContent = imageFile.name;
+  document.getElementById('btnAnalyze').disabled  = false;
+  document.getElementById('btnImgClear').disabled = false;
+  const url = URL.createObjectURL(imageFile);
+  const img = new window.Image();
+  img.onload = () => {
+    resultCanvas.width = img.naturalWidth;
+    resultCanvas.height = img.naturalHeight;
+    const ctx = resultCanvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    resultCanvas.classList.add('show');
+    hidePlaceholder();
+  };
+  img.src = url;
+  log('sys', 'Image loaded: ' + imageFile.name);
+}
+
+async function analyzeImage() {
+  if (!modelReady || !imageFile) return;
+  document.getElementById('btnAnalyze').disabled = true;
+  document.getElementById('btnAnalyze').textContent = 'Analyzing...';
+  document.getElementById('scanOverlay').classList.add('active');
+  const fd = new FormData();
+  fd.append('image', imageFile);
+  fd.append('threshold', threshold);
+  try {
+    const r = await fetch(API + '/api/detect/image', {
+      method: 'POST',
+      headers: NGROK_HEADERS,
+      body: fd
+    });
+    const data = await r.json();
+    if (data.error) { log('error', data.error); return; }
+    drawAnnotated(data.annotated, resultCanvas.width, resultCanvas.height);
+    updateStats(data.detections, data.phone_count, data.elapsed_ms);
+    log(data.phone_count > 0 ? 'found' : 'none',
+      data.phone_count > 0
+        ? `${data.phone_count} phone(s) detected — ${data.elapsed_ms}ms`
+        : `No phones found — ${data.elapsed_ms}ms`);
+  } catch(e) { log('error', 'Request failed: ' + e.message); }
+  document.getElementById('btnAnalyze').disabled = false;
+  document.getElementById('scanOverlay').classList.remove('active');
+  document.getElementById('btnAnalyze').textContent = 'Analyze';
+}
+
+function clearImage() {
+  imageFile = null;
+  document.getElementById('fileImg').value = '';
+  document.getElementById('imgName').textContent = '';
+  document.getElementById('btnAnalyze').disabled  = true;
+  document.getElementById('btnImgClear').disabled = true;
+  resultCanvas.classList.remove('show');
+  showPlaceholder(); hideAlert();
+}
+
+function drawAnnotated(b64, w, h) {
+  const img = new window.Image();
+  img.onload = () => {
+    resultCanvas.width  = w;
+    resultCanvas.height = h;
+    const ctx = resultCanvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, w, h);
+    resultCanvas.classList.add('show');
+    resultCanvas.style.position = 'absolute';
+    resultCanvas.style.top = '0';
+    resultCanvas.style.left = '0';
+    resultCanvas.style.width = '100%';
+    resultCanvas.style.height = '100%';
+    resultCanvas.style.objectFit = 'contain';
+    resultCanvas.style.zIndex = '3';
+  };
+  img.src = 'data:image/jpeg;base64,' + b64;
+}
+
+function updateStats(detections, phoneCount, latency) {
+  scanCount++;
+  document.getElementById('sScans').textContent  = scanCount;
+  document.getElementById('sPhones').textContent = phoneCount;
+  const phones = detections.filter(d => d.class_id === 77);
+  if (phones.length) {
+    const best = Math.max(...phones.map(d => d.score));
+    document.getElementById('sBestConf').textContent = Math.round(best * 100) + '%';
+  }
+  if (latency !== null && latency !== undefined) {
+    document.getElementById('sLatency').textContent = Math.round(latency);
+  }
+  const wrap = document.getElementById('detItems');
+  wrap.innerHTML = '';
+  if (!detections.length) {
+    wrap.innerHTML = '<div class="no-det">No objects above threshold.</div>';
+    hideAlert(); return;
+  }
+  detections.forEach(d => {
+    const isPhone = d.class_id === 77;
+    const pct = Math.round(d.score * 100);
+    const el = document.createElement('div');
+    el.className = 'det-item' + (isPhone ? ' phone-item' : '');
+    el.innerHTML = `
+      <span class="det-dot ${isPhone ? 'phone' : 'other'}"></span>
+      <span class="det-name ${isPhone ? 'phone' : ''}">${isPhone ? '&#9670; ' : ''}${d.label}</span>
+      <div class="conf-bar-wrap"><div class="conf-bar ${isPhone ? 'phone' : 'other'}" style="width:${pct}%"></div></div>
+      <span class="conf-pct">${pct}%</span>`;
+    wrap.appendChild(el);
+  });
+  if (phoneCount > 0) {
+    alertBanner.textContent = `◆  ${phoneCount} phone${phoneCount > 1 ? 's' : ''} detected in frame`;
+    alertBanner.classList.add('show');
+  } else { hideAlert(); }
+}
+
+let logCount = 0;
+function log(type, msg) {
+  logCount++;
+  if (logCount > 100) { const f = logEntries.firstChild; if (f) logEntries.removeChild(f); }
+  const t = new Date().toLocaleTimeString('en', { hour12: false });
+  const el = document.createElement('div');
+  el.className = 'log-entry';
+  el.innerHTML = `<span class="log-time">${t}</span><span class="log-msg ${type}">${msg}</span>`;
+  logEntries.appendChild(el);
+  document.getElementById('logArea').scrollTop = 9999;
+}
+
+function showPlaceholder() { placeholder.style.display = 'flex'; }
+function hidePlaceholder()  { placeholder.style.display = 'none'; }
+function hideAlert()        { alertBanner.classList.remove('show'); }
+
+setMode('cam');
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+BACK-END CODE
+
+
+import tensorflow as tf
+import subprocess
+
+subprocess.run(['pip', 'install', 'pyngrok==4.1.1', '-q'])
+
+gpus = tf.config.list_physical_devices('GPU')
+print('GPU:', gpus)
+if not gpus:
+    print('No GPU! Go to Runtime > Change runtime type > T4 GPU')
+else:
+    print('GPU ready!')
+
+subprocess.run(['pip', 'install', 'flask', 'flask-cors', 'pyngrok', 'opencv-python-headless', '-q'])
+print('Packages installed!')
+
+import subprocess
+subprocess.run(['pip', 'install', 'pyngrok', '--upgrade', '-q'])
+
+NGROK_TOKEN = '3BVtft5h5QuHrmFN9YvuOgWS2Aj_4Ygs3LnA1YnycnNhKLJuT'
+from pyngrok import ngrok
+if NGROK_TOKEN:
+    ngrok.set_auth_token(NGROK_TOKEN)
+    print('Ngrok token set!')
+else:
+    print('Please paste your ngrok token above!')
+
+# Step 3 - Download EfficientDet model
+import os, urllib.request, tarfile, shutil
+from pathlib import Path
+
+MODEL_URL = 'http://download.tensorflow.org/models/object_detection/tf2/20200711/efficientdet_d1_coco17_tpu-32.tar.gz'
+MODEL_DIR = Path('models/efficientdet_d1')
+SAVED_MODEL_PATH = MODEL_DIR / 'saved_model'
+
+if not SAVED_MODEL_PATH.exists():
+    print('Downloading EfficientDet D1...')
+    os.makedirs('models', exist_ok=True)
+    tarball = Path('models/efficientdet_d1.tar.gz')
+    urllib.request.urlretrieve(MODEL_URL, tarball)
+    print('Extracting...')
+    with tarfile.open(tarball, 'r:gz') as t:
+        t.extractall('models/_tmp', filter='data')
+    extracted = next(Path('models/_tmp').iterdir())
+    shutil.move(str(extracted), str(MODEL_DIR))
+    tarball.unlink(missing_ok=True)
+    tmp = Path('models/_tmp')
+    if tmp.exists():
+        shutil.rmtree(str(tmp))
+    print('Model downloaded!')
+else:
+    print('Model already exists!')
+
+# Step 4 - Load model and start Flask
+import base64, json, os, time, threading
+from pathlib import Path
+import cv2
+import numpy as np
+import tensorflow as tf
+from flask import Flask, Response, jsonify, request
+from flask_cors import CORS
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+PHONE_CLASS_ID = 77
+UPLOAD_FOLDER = Path('uploads')
+UPLOAD_FOLDER.mkdir(exist_ok=True)
+
+COCO_LABELS = {
+    1:'person', 2:'bicycle', 3:'car', 4:'motorcycle', 44:'bottle',
+    47:'cup', 63:'couch', 67:'dining table', 72:'tv', 73:'laptop',
+    74:'mouse', 75:'remote', 76:'keyboard', 77:'cell phone',
+    84:'book', 85:'clock'
+}
+
+print('Loading EfficientDet D1 on GPU...')
+model = tf.saved_model.load(str(Path('models/efficientdet_d1/saved_model')))
+infer_fn = model.signatures['serving_default']
+print('Model ready!')
+
+def iou(box1, box2):
+    y1 = max(box1[0], box2[0])
+    x1 = max(box1[1], box2[1])
+    y2 = min(box1[2], box2[2])
+    x2 = min(box1[3], box2[3])
+    inter = max(0, y2-y1) * max(0, x2-x1)
+    area1 = (box1[2]-box1[0]) * (box1[3]-box1[1])
+    area2 = (box2[2]-box2[0]) * (box2[3]-box2[1])
+    union = area1 + area2 - inter
+    return inter / union if union > 0 else 0
+
+def nms(detections, iou_threshold=0.5):
+    if not detections:
+        return []
+    detections = sorted(detections, key=lambda d: d['score'], reverse=True)
+    kept = []
+    for det in detections:
+        suppress = False
+        for k in kept:
+            if k['class_id'] == det['class_id'] and iou(det['box'], k['box']) > iou_threshold:
+                suppress = True
+                break
+        if not suppress:
+            kept.append(det)
+    return kept
+
+def run_inference(frame, threshold, orig_w, orig_h):
+    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    tensor = tf.convert_to_tensor(rgb[np.newaxis, ...], dtype=tf.uint8)
+    out = infer_fn(tensor)
+    scores  = out['detection_scores'][0].numpy()
+    classes = out['detection_classes'][0].numpy().astype(int)
+    boxes   = out['detection_boxes'][0].numpy()
+    CONFUSABLE = {75, 44, 47, 76, 74, 84, 85}
+    results = []
+    for score, cls_id, box in zip(scores, classes, boxes):
+        if cls_id == PHONE_CLASS_ID:
+            eff = threshold * 0.40
+        elif cls_id in CONFUSABLE:
+            eff = threshold * 1.35
+        else:
+            eff = threshold
+        if score < eff:
+            continue
+        if cls_id == PHONE_CLASS_ID:
+            y1b, x1b, y2b, x2b = box
+            bh, bw = y2b-y1b, x2b-x1b
+            if bh == 0 or bw == 0:
+                continue
+            if bh/bw > 4.0 or bh/bw < 0.3:
+                continue
+            if (bh*orig_h)*(bw*orig_w) < orig_w*orig_h*0.0005:
+                continue
+        results.append({
+            'class_id': int(cls_id),
+            'label': COCO_LABELS.get(int(cls_id), f'class_{cls_id}'),
+            'score': round(float(score), 4),
+            'box': [round(float(v), 6) for v in box]
+        })
+    return results
+
+def detect(frame_bgr, threshold=0.45, use_tiling=True):
+    lab = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2LAB)
+    l, a, b = cv2.split(lab)
+    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
+    l = clahe.apply(l)
+    frame_bgr = cv2.cvtColor(cv2.merge([l,a,b]), cv2.COLOR_LAB2BGR)
+    h, w = frame_bgr.shape[:2]
+    full = cv2.resize(frame_bgr, (640, 640))
+    all_results = run_inference(full, threshold, w, h)
+    if not use_tiling:
+        return nms(all_results, iou_threshold=0.5)
+    tiles = [
+        (frame_bgr[0:h//2, 0:w//2],  0,    0),
+        (frame_bgr[0:h//2, w//2:w],  w//2, 0),
+        (frame_bgr[h//2:h, 0:w//2],  0,    h//2),
+        (frame_bgr[h//2:h, w//2:w],  w//2, h//2),
+    ]
+    for tile, tx, ty in tiles:
+        th, tw = tile.shape[:2]
+        resized = cv2.resize(tile, (640, 640))
+        tile_results = run_inference(resized, threshold, tw, th)
+        for r in tile_results:
+            y1, x1, y2, x2 = r['box']
+            r['box'] = [
+                (y1*th+ty)/h, (x1*tw+tx)/w,
+                (y2*th+ty)/h, (x2*tw+tx)/w
+            ]
+        all_results.extend(tile_results)
+    return nms(all_results)
+
+def annotate(frame_bgr, detections):
+    h, w = frame_bgr.shape[:2]
+    out = frame_bgr.copy()
+    for det in detections:
+        y1, x1, y2, x2 = det['box']
+        px1, py1 = int(x1*w), int(y1*h)
+        px2, py2 = int(x2*w), int(y2*h)
+        is_phone = det['class_id'] == PHONE_CLASS_ID
+        conf = f"{det['score']*100:.0f}%"
+        if is_phone:
+            cv2.rectangle(out,(px1,py1),(px2,py2),(0,220,160),2)
+            cs = 14
+            for cx,cy,dx,dy in [(px1,py1,1,1),(px2,py1,-1,1),(px1,py2,1,-1),(px2,py2,-1,-1)]:
+                cv2.line(out,(cx,cy),(cx+dx*cs,cy),(255,255,255),2)
+                cv2.line(out,(cx,cy),(cx,cy+dy*cs),(255,255,255),2)
+            tag = f' PHONE {conf} '
+            (tw,th),_ = cv2.getTextSize(tag,cv2.FONT_HERSHEY_SIMPLEX,0.52,1)
+            cv2.rectangle(out,(px1,py1-th-8),(px1+tw,py1),(0,200,140),-1)
+            cv2.putText(out,tag,(px1,py1-4),cv2.FONT_HERSHEY_SIMPLEX,0.52,(0,0,0),1,cv2.LINE_AA)
+        else:
+            cv2.rectangle(out,(px1,py1),(px2,py2),(100,100,100),1)
+            cv2.putText(out,f"{det['label']} {conf}",(px1+2,py1-4),cv2.FONT_HERSHEY_SIMPLEX,0.4,(120,120,120),1,cv2.LINE_AA)
+    return out
+
+def to_b64(frame):
+    _, buf = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 75])
+    return base64.b64encode(buf).decode()
+
+app = Flask(__name__)
+CORS(app, origins='*', allow_headers=['Content-Type', 'ngrok-skip-browser-warning'])
+
+@app.route('/api/status')
+def status():
+    return jsonify({'status': 'ready'})
+
+@app.route('/api/detect/image', methods=['POST'])
+def detect_image():
+    file = request.files.get('image')
+    threshold = float(request.form.get('threshold', 0.45))
+    if not file:
+        return jsonify({'error': 'No image'}), 400
+    img_bytes = np.frombuffer(file.read(), np.uint8)
+    frame = cv2.imdecode(img_bytes, cv2.IMREAD_COLOR)
+    if frame is None:
+        return jsonify({'error': 'Could not decode image'}), 400
+    t0 = time.time()
+    detections = detect(frame, threshold, use_tiling=True)
+    elapsed_ms = round((time.time()-t0)*1000, 1)
+    annotated = annotate(frame, detections)
+    phones = [d for d in detections if d['class_id'] == PHONE_CLASS_ID]
+    return jsonify({'detections': detections, 'phone_count': len(phones),
+                    'elapsed_ms': elapsed_ms, 'annotated': to_b64(annotated)})
+
+@app.route('/api/detect/frame', methods=['POST'])
+def detect_frame():
+    data = request.get_json()
+    if not data or 'frame' not in data:
+        return jsonify({'error': 'No frame'}), 400
+    threshold = float(data.get('threshold', 0.45))
+    b64 = data['frame'].split(',')[-1]
+    img_bytes = np.frombuffer(base64.b64decode(b64), np.uint8)
+    frame = cv2.imdecode(img_bytes, cv2.IMREAD_COLOR)
+    if frame is None:
+        return jsonify({'error': 'Could not decode frame'}), 400
+    detections = detect(frame, threshold,  use_tiling=False)
+    annotated = annotate(frame, detections)
+    phones = [d for d in detections if d['class_id'] == PHONE_CLASS_ID]
+    return jsonify({'detections': detections, 'phone_count': len(phones), 'annotated': to_b64(annotated)})
+
+@app.route('/api/detect/video', methods=['POST'])
+def detect_video():
+    file = request.files.get('video')
+    threshold = float(request.form.get('threshold', 0.45))
+    if not file:
+        return jsonify({'error': 'No video'}), 400
+    save_path = UPLOAD_FOLDER / f'vid_{int(time.time())}.mp4'
+    file.save(str(save_path))
+    def generate():
+        cap = cv2.VideoCapture(str(save_path))
+        total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) or 1
+        idx = 0
+        phone_frames = 0
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            idx += 1
+            if idx % 3 == 0 or idx == 1:
+                detections = detect(frame, threshold)
+                annotated = annotate(frame, detections)
+                phones = [d for d in detections if d['class_id'] == PHONE_CLASS_ID]
+                if phones:
+                    phone_frames += 1
+            else:
+                detections = []
+                phones = []
+                annotated = frame
+            payload = json.dumps({'frame': to_b64(annotated), 'detections': detections,
+                                   'phone_count': len(phones), 'progress': round(idx/total*100,1),
+                                   'frame_idx': idx, 'total': total})
+            yield f'data: {payload}\n\n'
+        cap.release()
+        save_path.unlink(missing_ok=True)
+        yield f'data: {json.dumps({"done": True, "phone_frames": phone_frames, "total_frames": idx})}\n\n'
+    return Response(generate(), mimetype='text/event-stream',
+                    headers={'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'})
+
+print('Flask app ready!')
+
+# Step 5 - Start server and get public URL
+import threading
+from pyngrok import ngrok
+
+def run_app():
+    app.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False)
+
+t = threading.Thread(target=run_app, daemon=True)
+t.start()
+
+import time
+time.sleep(2)
+
+public_url = ngrok.connect(5000)
+print('=' * 60)
+print('PHONEFINDER IS RUNNING ON GPU!')
+print('=' * 60)
+print(f'Your public URL: {public_url}')
+print()
+print('Paste this into your index.html:')
+print(f'const API = "{public_url}";')
+print('=' * 60)
+print('Keep this notebook running!')
+
