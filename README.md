@@ -42,7 +42,7 @@ A computer vision project that detects mobile phones in images and live camera f
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/PhoneFinder.git
+   git clone https://github.com/Ritchie06/PhoneFinder.git
    cd PhoneFinder
    ```
 
@@ -87,8 +87,7 @@ PhoneFinder/
 **Ritchie Tanya**  
 AI & Data Science Graduate | AI & Machine Learning Enthusiast
 
-- GitHub: [@YOUR_USERNAME](https://github.com/YOUR_USERNAME)
-- LinkedIn: [Connect with me](YOUR_LINKEDIN_URL)
+- GitHub: Ritchie06(https://github.com/Ritchie06)
 
 ---
 
